@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f6cfe0" />
+  <meta name="description" content="Yarnicorn — an all-in-one crochet hub for stash, projects, patterns, counters, palettes, granny-square planning, and yarn estimates." />
+  <title>Yarnicorn Crochet Hub</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <button class="mobile-menu" id="mobileMenu" aria-label="Open navigation">☰</button>
+    <div class="brand">
+      <span class="brand-mark">🧶</span>
+      <div><strong>Yarnicorn</strong><small>Crochet Hub</small></div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-button" id="themeToggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+      <button class="pill-button hidden" id="installBtn">Install App</button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <nav>
+        <button class="nav-item active" data-screen="home"><span>🏠</span> Home</button>
+        <button class="nav-item" data-screen="projects"><span>🧵</span> Projects</button>
+        <button class="nav-item" data-screen="stash"><span>🧺</span> Stash</button>
+        <button class="nav-item" data-screen="patterns"><span>📖</span> Pattern Reader</button>
+        <button class="nav-item" data-screen="granny"><span>🟪</span> Granny Studio</button>
+        <button class="nav-item" data-screen="palette"><span>🎨</span> Palette Studio</button>
+        <button class="nav-item" data-screen="tools"><span>🧮</span> Tools</button>
+        <button class="nav-item" data-screen="gallery"><span>✨</span> Gallery</button>
+        <button class="nav-item" data-screen="settings"><span>⚙️</span> Settings</button>
+      </nav>
+      <div class="sidebar-note">
+        <strong>Made for yarn goblins 💕</strong>
+        <small>Local-first. Your crochet data stays on your device unless you export or enable sync.</small>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="screen active" id="home">
+        <div class="welcome">
+          <div>
+            <span class="eyebrow">YOUR CROCHET COMMAND CENTER</span>
+            <h1>What are we making today, qween?</h1>
+            <p>Projects, stash, patterns, counters, palettes, and planning — finally in one cute place.</p>
+          </div>
+          <div class="yarn-orb">🧶</div>
+        </div>
+
+        <div class="stats-grid">
+          <button class="stat-card" data-jump="projects"><b id="statWips">0</b><span>WIPs</span></button>
+          <button class="stat-card" data-jump="stash"><b id="statStash">0</b><span>Stash items</span></button>
+          <button class="stat-card" data-jump="patterns"><b id="statPatterns">0</b><span>Patterns</span></button>
+          <button class="stat-card" data-jump="gallery"><b id="statFinished">0</b><span>Finished</span></button>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="card span-2">
+            <div class="card-head">
+              <div><span class="eyebrow">PICK UP WHERE YOU LEFT OFF</span><h2>Current WIPs</h2></div>
+              <button class="text-button" data-jump="projects">View all →</button>
+            </div>
+            <div id="homeWips" class="horizontal-list empty">No WIPs yet. Start something cute.</div>
+          </article>
+
+          <article class="card counter-card">
+            <div class="card-head"><div><span class="eyebrow">QUICK TOOL</span><h2>Row Counter</h2></div></div>
+            <div class="big-counter">
+              <button id="quickRowMinus">−</button>
+              <div><b id="quickRowCount">0</b><span>rows</span></div>
+              <button id="quickRowPlus">+</button>
+            </div>
+            <button class="soft-button full" id="quickRowReset">Reset</button>
+          </article>
+
+          <article class="card">
+            <div class="card-head"><div><span class="eyebrow">INSPIRATION</span><h2>Project Picker</h2></div></div>
+            <p class="muted">Get a little nudge based on the supplies you tend to keep around.</p>
+            <button class="primary-button full" id="projectPicker">Surprise me ✨</button>
+            <div class="picker-result" id="projectPickerResult"></div>
+          </article>
+
+          <article class="card">
+            <div class="card-head"><div><span class="eyebrow">DON'T FORGET</span><h2>Quick Notes</h2></div></div>
+            <textarea id="quickNotes" placeholder="Where you stopped, hook size, a weird stitch count, gift idea..."></textarea>
+          </article>
+        </div>
+      </section>
+
+      <section class="screen" id="projects">
+        <div class="page-head">
+          <div><span class="eyebrow">PROJECT TRACKING</span><h1>Projects</h1><p>Plan it, WIP it, finish it, frog it, or send it to the graveyard.</p></div>
+          <button class="primary-button" id="addProject">+ New project</button>
+        </div>
+        <div class="segmented" id="projectFilters">
+          <button class="active" data-project-filter="all">All</button>
+          <button data-project-filter="planned">Planned</button>
+          <button data-project-filter="wip">WIPs</button>
+          <button data-project-filter="finished">Finished</button>
+          <button data-project-filter="abandoned">🪦 Graveyard</button>
+        </div>
+        <div id="projectGrid" class="cards-grid"></div>
+      </section>
+
+      <section class="screen" id="stash">
+        <div class="page-head">
+          <div><span class="eyebrow">SUPPLY TRACKING</span><h1>Stash</h1><p>Yarn, hooks, needles, eyes, stuffing, markers, hardware, and all the tiny things.</p></div>
+          <button class="primary-button" id="addStash">+ Add supply</button>
+        </div>
+
+        <div class="toolbar">
+          <input id="stashSearch" type="search" placeholder="Search stash…">
+          <select id="stashCategoryFilter">
+            <option value="all">All categories</option>
+            <option>Yarn</option><option>Crochet Hook</option><option>Tapestry Needle</option>
+            <option>Safety Eyes</option><option>Stuffing</option><option>Stitch Markers</option>
+            <option>Keychain Hardware</option><option>Embroidery Floss</option><option>Blocking</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div id="stashGrid" class="cards-grid"></div>
+      </section>
+
+      <section class="screen" id="patterns">
+        <div class="page-head">
+          <div><span class="eyebrow">LINE-BY-LINE MODE</span><h1>Pattern Reader</h1><p>Import a text/PDF pattern, break it into steps, and check off each line as you crochet.</p></div>
+          <button class="primary-button" id="newPattern">+ Add pattern</button>
+        </div>
+        <div class="pattern-layout">
+          <aside class="card pattern-library">
+            <h2>Your patterns</h2>
+            <div id="patternLibrary" class="stack-list"></div>
+          </aside>
+          <article class="card pattern-reader">
+            <div id="patternEmpty" class="empty-state">
+              <div class="empty-icon">📖</div><h2>No pattern selected</h2>
+              <p>Add a pattern, paste text, or import a .txt/.pdf file.</p>
+            </div>
+            <div id="patternActive" class="hidden">
+              <div class="card-head">
+                <div><span class="eyebrow">CURRENT PATTERN</span><h2 id="patternTitle"></h2></div>
+                <div class="row-actions">
+                  <button class="soft-button" id="patternEdit">Edit</button>
+                  <button class="danger-button" id="patternDelete">Delete</button>
+                </div>
+              </div>
+              <div class="progress-shell"><span id="patternProgressBar"></span></div>
+              <div class="pattern-progress-line"><b id="patternProgressText">0%</b><button class="text-button" id="patternResetChecks">Reset checks</button></div>
+              <div id="patternSteps" class="pattern-steps"></div>
+              <textarea id="patternNotes" placeholder="Notes for this pattern…"></textarea>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="screen" id="granny">
+        <div class="page-head">
+          <div><span class="eyebrow">BLANKET & MOTIF PLANNING</span><h1>Granny Square Studio</h1><p>Build a grid, pick colors, upload inspiration, shuffle layouts, and track each square.</p></div>
+          <button class="primary-button" id="saveGranny">Save plan</button>
+        </div>
+
+        <div class="granny-layout">
+          <aside class="card controls-card">
+            <label>Plan name<input id="grannyName" value="My Granny Square Project"></label>
+            <div class="two-col">
+              <label>Columns<input id="grannyCols" type="number" min="1" max="20" value="5"></label>
+              <label>Rows<input id="grannyRows" type="number" min="1" max="20" value="6"></label>
+            </div>
+            <label>Base / border color<input id="grannyBase" type="color" value="#fff3e7"></label>
+            <label>Palette colors
+              <div id="grannyPaletteInputs" class="palette-inputs"></div>
+            </label>
+            <div class="row-actions">
+              <button class="soft-button" id="addGrannyColor">+ color</button>
+              <button class="soft-button" id="removeGrannyColor">− color</button>
+            </div>
+            <label class="check-row"><input id="avoidNeighbors" type="checkbox" checked> Avoid matching neighbors when shuffling</label>
+            <div class="stack-buttons">
+              <button class="primary-button" id="buildGranny">Build / resize grid</button>
+              <button class="soft-button" id="shuffleGranny">Shuffle colors</button>
+              <button class="soft-button" id="clearGranny">Reset square statuses</button>
+            </div>
+            <hr>
+            <h3 class="control-heading">Square editor</h3>
+            <p class="tiny muted">Click any square in the blanket preview to edit that exact square here.</p>
+            <div class="selected-square-card">
+              <div class="selected-square-visual" id="selectedSquareVisual"></div>
+              <div>
+                <strong id="selectedSquareTitle">Square 1</strong>
+                <div class="tiny muted" id="selectedSquareMeta">Solid color · Not started</div>
+              </div>
+            </div>
+            <label>Selected square
+              <input id="selectedSquareNumber" type="number" min="1" value="1">
+            </label>
+            <div class="two-col">
+              <label>Square color<input id="squareEditorColor" type="color" value="#d66f42"></label>
+              <label>Status
+                <select id="squareEditorStatus">
+                  <option value="todo">Not started</option>
+                  <option value="doing">In progress</option>
+                  <option value="done">Finished</option>
+                  <option value="joined">Joined</option>
+                </select>
+              </label>
+            </div>
+            <label>Motif image
+              <input id="squareEditorMotif" type="file" accept="image/*">
+            </label>
+            <div class="two-col">
+              <button class="soft-button" id="applySquareMotif">Apply motif</button>
+              <button class="soft-button" id="removeSquareMotif">Remove motif</button>
+            </div>
+            <button class="soft-button full" id="jumpNextSquare">Select next square →</button>
+            <p class="tiny muted">Square images are resized in your browser and saved locally with the granny-square plan, so you do not need to redo your sync setup.</p>
+
+            <hr>
+            <label>Inspiration image
+              <input id="grannyImage" type="file" accept="image/*">
+            </label>
+            <button class="soft-button full" id="extractColors">Extract palette from image</button>
+            <canvas id="imageCanvas" class="hidden"></canvas>
+            <p class="tiny muted">Color extraction runs in your browser; the image is not uploaded anywhere.</p>
+          </aside>
+
+          <article class="card">
+            <div class="card-head">
+              <div><span class="eyebrow">WHOLE PROJECT</span><h2>Blanket preview</h2></div>
+              <span id="grannyProgress" class="progress-badge">0 / 30 done</span>
+            </div>
+            <div id="grannyGrid" class="granny-grid"></div>
+            <div class="legend">
+              <span><i class="dot todo"></i> Not started</span><span><i class="dot doing"></i> In progress</span><span><i class="dot done"></i> Finished</span><span><i class="dot joined"></i> Joined</span>
+            </div>
+            <p class="tiny muted">Click a square to select it, then edit its color, status, or motif directly in the Square Editor. Motif images stay attached while you update the square.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="screen" id="palette">
+        <div class="page-head">
+          <div><span class="eyebrow">COLOR PLAYGROUND</span><h1>Palette Studio</h1><p>Build a palette from a vibe, a base color, an image, or just the yarn already in your stash.</p></div>
+        </div>
+        <div class="dashboard-grid">
+          <article class="card">
+            <h2>Vibe generator</h2>
+            <label>Vibe
+              <select id="vibeSelect">
+                <option>Girlypop</option><option>Autumn Harvest</option><option>Halloween</option>
+                <option>Cottagecore</option><option>Strawberry</option><option>Pastel Dream</option>
+                <option>Gothic Romance</option><option>Christmas Cozy</option><option>Ocean</option>
+              </select>
+            </label>
+            <button class="primary-button full" id="generateVibe">Give me a palette ✨</button>
+          </article>
+
+          <article class="card">
+            <h2>Build around a color</h2>
+            <label>Base color<input id="basePaletteColor" type="color" value="#e985b0"></label>
+            <label>Harmony
+              <select id="harmonySelect"><option>Analogous</option><option>Complementary</option><option>Triadic</option><option>Soft monochrome</option></select>
+            </label>
+            <button class="primary-button full" id="generateHarmony">Generate</button>
+          </article>
+
+          <article class="card">
+            <h2>Use only my stash</h2>
+            <p class="muted">Pulls colors from yarn entries that have a color saved.</p>
+            <button class="soft-button full" id="stashPalette">Make stash palette</button>
+          </article>
+
+          <article class="card span-2 palette-output-card">
+            <div class="card-head"><div><span class="eyebrow">CURRENT PALETTE</span><h2 id="paletteName">Girlypop</h2></div><button class="soft-button" id="sendPaletteToGranny">Use in Granny Studio</button></div>
+            <div id="paletteOutput" class="palette-output"></div>
+            <div id="paletteAccessibility" class="accessibility-note"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="screen" id="tools">
+        <div class="page-head">
+          <div><span class="eyebrow">HANDY LITTLE HELPERS</span><h1>Tools</h1><p>Counters, gauge math, yarn estimates, and quick conversions.</p></div>
+          <button class="primary-button" id="addCounter">+ New counter</button>
+        </div>
+
+        <div class="cards-grid" id="counterGrid"></div>
+
+        <div class="dashboard-grid tools-grid">
+          <article class="card">
+            <h2>Gauge calculator</h2>
+            <div class="two-col">
+              <label>Stitches<input id="gaugeSts" type="number" min="0" step="0.1"></label>
+              <label>Across (in)<input id="gaugeIn" type="number" min="0" step="0.1"></label>
+            </div>
+            <label>Desired width (in)<input id="gaugeDesired" type="number" min="0" step="0.1"></label>
+            <button class="primary-button full" id="gaugeCalc">Calculate</button>
+            <div class="tool-result" id="gaugeResult"></div>
+          </article>
+
+          <article class="card span-2">
+            <h2>Yarn amount estimator</h2>
+            <div class="three-col">
+              <label>Project type
+                <select id="yarnProjectType">
+                  <option value="blanket">Blanket</option><option value="granny">Granny-square blanket</option>
+                  <option value="scarf">Scarf</option><option value="hat">Hat</option><option value="amigurumi">Amigurumi / plush</option>
+                  <option value="wearable">Wearable</option>
+                </select>
+              </label>
+              <label>Yarn weight
+                <select id="yarnWeight">
+                  <option value="1">#1 Super Fine</option><option value="2">#2 Fine</option><option value="3">#3 Light</option>
+                  <option value="4" selected>#4 Medium</option><option value="5">#5 Bulky</option><option value="6">#6 Super Bulky</option>
+                </select>
+              </label>
+              <label>Safety buffer
+                <select id="yarnBuffer"><option value=".1">10%</option><option value=".15" selected>15%</option><option value=".2">20%</option></select>
+              </label>
+            </div>
+            <div class="two-col">
+              <label>Width / circumference (in)<input id="yarnWidth" type="number" value="50" min="1"></label>
+              <label>Length / height (in)<input id="yarnLength" type="number" value="60" min="1"></label>
+            </div>
+            <div class="two-col">
+              <label>Yards per skein<input id="yardsPerSkein" type="number" value="200" min="1"></label>
+              <label>Number of colors<input id="yarnColors" type="number" value="1" min="1" max="30"></label>
+            </div>
+            <button class="primary-button full" id="estimateYarn">Estimate yarn</button>
+            <div class="tool-result" id="yarnResult"></div>
+            <p class="tiny muted">This is a planning estimate, not a substitute for a pattern's yardage. Stitch density, fiber, tension, hook, and motif construction can change usage a lot.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="screen" id="gallery">
+        <div class="page-head">
+          <div><span class="eyebrow">LOOK WHAT YOU MADE</span><h1>Finished Gallery</h1><p>Completed projects automatically show up here.</p></div>
+        </div>
+        <div id="galleryGrid" class="gallery-grid"></div>
+      </section>
+
+      <section class="screen" id="settings">
+        <div class="page-head">
+          <div><span class="eyebrow">BACKUP & SYNC</span><h1>Settings</h1><p>Install, back up your data, and optionally connect free cloud sync.</p></div>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="card">
+            <h2>Backup</h2>
+            <p class="muted">Download everything as a JSON file that you can restore later.</p>
+            <button class="primary-button full" id="exportData">Export backup</button>
+            <label class="file-label">Import backup<input id="importDataFile" type="file" accept=".json,application/json"></label>
+            <button class="soft-button full" id="importData">Import selected file</button>
+          </article>
+
+          <article class="card">
+            <h2>Free cloud sync</h2>
+            <p class="muted">Optional Supabase sync lets the same crochet library appear on your phone and PC. Your app works without it.</p>
+            <label>Supabase project URL<input id="supabaseUrl" placeholder="https://xxxx.supabase.co"></label>
+            <label>Supabase publishable key<input id="supabaseKey" type="password" placeholder="sb_publishable_…"></label>
+            <label>Your private sync ID<input id="syncId" placeholder="Use the same private ID on every device"></label>
+            <button class="soft-button full" id="generateSyncId" type="button">Generate a strong sync ID</button>
+            <div class="two-col">
+              <button class="soft-button" id="syncPull">Pull</button>
+              <button class="primary-button" id="syncPush">Push</button>
+            </div>
+            <div id="syncStatus" class="tiny muted"></div>
+            <details>
+              <summary>One-time free Supabase setup</summary>
+              <p class="tiny">Create a free Supabase project, then run the included <code>supabase_setup.sql</code> in its SQL editor. Paste the Project URL and anon key here. Use the same private sync ID on both devices.</p>
+            </details>
+          </article>
+
+          <article class="card">
+            <h2>About this build</h2>
+            <p class="muted">Yarnicorn is a local-first installable web app. No subscription, no account required for local use.</p>
+            <button class="soft-button full" id="installSettings">Install on this device</button>
+          </article>
+
+          <article class="card danger-card">
+            <h2>Danger zone</h2>
+            <p class="muted">This permanently clears the data stored in this browser.</p>
+            <button class="danger-button full" id="clearAll">Clear all local data</button>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="active" data-screen="home">🏠<span>Home</span></button>
+    <button data-screen="projects">🧵<span>Projects</span></button>
+    <button data-screen="stash">🧺<span>Stash</span></button>
+    <button data-screen="patterns">📖<span>Patterns</span></button>
+    <button data-screen="tools">✨<span>More</span></button>
+  </nav>
+
+  <dialog id="modal">
+    <form method="dialog" id="modalForm">
+      <div class="modal-head">
+        <div><span class="eyebrow" id="modalEyebrow">ADD</span><h2 id="modalTitle">New item</h2></div>
+        <button type="button" class="icon-button" data-modal-cancel aria-label="Close">✕</button>
+      </div>
+      <div id="modalFields"></div>
+      <div class="modal-actions">
+        <button type="button" class="soft-button" data-modal-cancel>Cancel</button>
+        <button type="submit" value="default" class="primary-button" id="modalSave">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
