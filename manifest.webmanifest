@@ -1,0 +1,17 @@
+{
+  "name": "Yarnicorn Crochet Hub",
+  "short_name": "Yarnicorn",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fff8fb",
+  "theme_color": "#f6cfe0",
+  "description": "An all-in-one crochet stash, project, pattern, granny-square and tools app.",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
